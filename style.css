@@ -48,6 +48,8 @@ input[type="text"] {
 	font-size: 16px;
 }
 
+/******* Buttons *******/
+
 button {
 	padding: 12px 24px;
 	border: none;
@@ -111,6 +113,19 @@ button {
 	background: #da190b;
 }
 
+.btn-reset {
+	background: #9c27b0;
+	color: white;
+	padding: 15px 40px;
+	font-size: 18px;
+}
+
+.btn-reset:hover {
+	background: #7b1fa2;
+}
+
+/******* Player List *******/
+
 .player-list {
 	display: grid;
 	gap: 10px;
@@ -154,6 +169,7 @@ button {
 	padding: 20px;
 	border-radius: 12px;
 	box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+	text-align: center;
 }
 
 .player-card.active {
@@ -228,17 +244,6 @@ button {
 	font-size: 2.5em;
 	color: #333;
 	margin-bottom: 20px;
-}
-
-.btn-reset {
-	background: #9c27b0;
-	color: white;
-	padding: 15px 40px;
-	font-size: 18px;
-}
-
-.btn-reset:hover {
-	background: #7b1fa2;
 }
 
 .hidden {

@@ -1,3 +1,4 @@
+
 // ===========================
 // FRONTEND COMPONENTS (UI Builders)
 // ===========================
@@ -11,13 +12,12 @@ class HTMLBuilder {
 		const element = document.createElement(tag);
 		if (className) element.className = className;
 		Object.entries(attributes).forEach(([key, value]) => {
-			if (key === 'textContent') {
+			if (key === 'textContent')
 				element.textContent = value;
-			} else if (key.startsWith('on')) {
+			else if (key.startsWith('on'))
 				element.addEventListener(key.substring(2).toLowerCase(), value);
-			} else {
+			else
 				element.setAttribute(key, value);
-			}
 		});
 		return element;
 	}
@@ -40,6 +40,10 @@ class HTMLBuilder {
 		return this.createElement('div', className, { textContent });
 	}
 }
+
+// ===========================
+// FRONTEND COMPONENTS (UI Builders)
+// ===========================
 
 /**
  * Setup View Component
@@ -273,8 +277,8 @@ class GameView {
 	handleRollAction() {
 		const state = this.gameEngine.getGameState();
 
-		if (!state.hasRolledThisRound) {
-			this.gameEngine.rollAllDice();
+		if (!state.hasPlayedThisRound) {
+			this.gameEngine.playRound();
 			this.rollButton.textContent = 'Next Round';
 			this.updatePlayersGrid();
 		} else {
@@ -317,18 +321,18 @@ class GameView {
 		if (winners.length === 1) {
 			content = `
 				<p style="font-size: 2em; margin: 20px 0;"><strong>${winners[0].name}</strong> wins!</p>
-				<p style="font-size: 1.5em;">Total Score: ${winners[0].getTotalScore()}</p>
+				<p style="font-size: 1.5em;">Total Score: ${winners[0].totalScore}</p>
 			`;
 		} else {
 			content = `
 				<p style="font-size: 2em; margin: 20px 0;">It's a tie!</p>
-				<p style="font-size: 1.5em;">${winners.map(w => w.name).join(' & ')} tied with ${winners[0].getTotalScore()} points</p>
+				<p style="font-size: 1.5em;">${winners.map(w => w.name).join(' & ')} tied with ${winners[0].totalScore} points</p>
 			`;
 		}
 
 		content += '<div style="margin-top: 20px;">';
 		this.gameEngine.players.forEach(player => {
-			content += `<p style="margin: 5px 0;">${player.name}: ${player.getTotalScore()} (${player.roundScores.join(', ')})</p>`;
+			content += `<p style="margin: 5px 0;">${player.name}: ${player.totalScore} (${player.roundScores.join(', ')})</p>`;
 		});
 		content += '</div>';
 
@@ -343,6 +347,22 @@ class GameView {
 	}
 }
 
+class MainMenuView {
+	constructor(gameEngine, onReset) {
+		this.gameEngine = gameEngine;
+		this.onReset = onReset;
+		this.container = null;
+	}
+
+	render () {
+		this.container = HTMLBuilder.createDiv('game-section');
+	}
+
+
+
+
+}
+
 /**
  * Application Controller
  * Manages the overall application flow
@@ -350,31 +370,39 @@ class GameView {
 class GameApp {
 	constructor(containerId) {
 		this.container = document.getElementById(containerId);
-		this.gameEngine = new GameEngine();
+		this.registry = new GameRegistry();
+		this.currentGame = null;
 		this.currentView = null;
 		
 		this.init();
 	}
 
+	// For now, auto-select dice game
+	// Later you can add game selection menu
 	init() {
+		this.selectGame('dice');
+	}
+
+	selectGame(gameId) {
+		this.currentGame = this.registry.createGame(gameId);
 		this.showSetupView();
 	}
 
 	showSetupView() {
 		this.clearView();
-		this.currentView = new SetupView(this.gameEngine, () => this.startGame());
+		this.currentView = new SetupView(this.currentGame, () => this.startGame());
 		this.container.appendChild(this.currentView.render());
 	}
 
 	showGameView() {
 		this.clearView();
-		this.currentView = new GameView(this.gameEngine, () => this.resetGame());
+		this.currentView = new GameView(this.currentGame, () => this.resetGame());
 		this.container.appendChild(this.currentView.render());
 	}
 
 	startGame() {
 		try {
-			this.gameEngine.startGame();
+			this.currentGame.startGame();
 			this.showGameView();
 		} catch (error) {
 			alert(error.message);
@@ -382,7 +410,7 @@ class GameApp {
 	}
 
 	resetGame() {
-		this.gameEngine.reset();
+		this.currentGame.reset();
 		this.showSetupView();
 	}
 
