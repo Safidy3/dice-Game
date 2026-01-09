@@ -171,11 +171,6 @@ class KingOfDiamondEngine extends GameEngine {
 		this.playRound();
 	}
 
-	autoPlayRound() {
-
-	}
-
-
 	calculateTargetNumber(players) {
 		const sum = players.reduce((acc, p) => acc + p.currentChoice, 0);
 		const average = sum / players.length;
@@ -281,26 +276,13 @@ class KingOfDiamondEngine extends GameEngine {
 		return activePlayers.every(p => p.currentChoice !== null);
 	}
 }
-// - Resets choices
-// - Continues until winner// Setup
+
 const game = new KingOfDiamondEngine();
 game.addPlayer("Alice");
 game.addPlayer("Bob");
 game.addPlayer("Charlie");
-game.startGame();
-
-// Round 1: All players choose
-game.players[0].makeChoice(60); // Alice
-game.players[1].makeChoice(80); // Bob  
-game.players[2].makeChoice(40); // Charlie
 
 // Play round
+game.startGame();
 game.playRound();
-// Average = (60 + 80 + 40) / 3 = 60
-// Target = 60 × 0.8 = 48
-// Distances: Alice=12, Bob=32, Charlie=8
-// Winner: Charlie (closest to 48)
-// Alice & Bob lose 1 point (now have 9 points)
-
-// Advance round
 game.advanceRound();
