@@ -1,3 +1,5 @@
+import { GameEngine } from './index.js';
+import { Player } from './index.js';
 
 // ===========================
 // FRONTEND COMPONENTS (UI Builders)
@@ -78,7 +80,7 @@ class SetupView {
 
 	buildInputSection() {
 		const inputContainer = HTMLBuilder.createDiv('player-input');
-		
+
 		this.playerInput = HTMLBuilder.createInput('text', 'Enter player name');
 		this.playerInput.addEventListener('keypress', (e) => {
 			if (e.key === 'Enter') this.handleAddPlayer();
@@ -128,7 +130,7 @@ class SetupView {
 
 	buildPlayerItem(player) {
 		const item = HTMLBuilder.createDiv('player-item');
-		
+
 		const nameSpan = HTMLBuilder.createElement('span', '', {
 			textContent: player.name
 		});
@@ -153,6 +155,62 @@ class SetupView {
 		if (this.container && this.container.parentNode) {
 			this.container.parentNode.removeChild(this.container);
 		}
+	}
+}
+
+class MainMenuView {
+	constructor(gameRegistry) {
+		this.gameRegistry = gameRegistry;
+		this.container = null;
+	}
+
+	render() {
+		// this.container = HTMLBuilder.createDiv('main-menu-section');
+
+		// const title = HTMLBuilder.createElement('h2', '', {
+		// 	textContent: 'Select a Game'
+		// });
+		// title.style.marginBottom = '20px';
+
+		// const diceGameButton = HTMLBuilder.createButton('Dice Game', 'btn-game', () => {
+		// 	this.onSelectGame('dice');
+		// });
+
+		// this.container.appendChild(title);
+		// this.container.appendChild(diceGameButton);
+
+		this.container = `
+			<div class="players-grid">
+				<div class="player-card ">
+					<div class="player-name">Dice game</div>
+					<div class="dice-container">
+						<div class="die">🎲</div>
+					</div>
+					<div class="score-info">
+						<p class="total-score">Total Scores: 0</p>
+					</div>
+					<button class="btn-reset">New Game</button>
+				</div>
+				<div class="player-card ">
+					<div class="player-name">shi fu mi</div>
+					<div class="dice-container">
+						<div class="die">✊🏻</div>
+						<div class="die">🖐🏻</div>
+						<div class="die">✌🏻</div>
+					</div>
+					<div class="score-info">
+						<p class="total-score">Total Scores: 0</p>
+					</div>
+					<button class="btn-reset">New Game</button>
+				</div>
+			</div>
+		`
+		return this.container;
+	}
+
+	destroy() {
+		if (this.container && this.container.parentNode)
+			this.container.parentNode.removeChild(this.container);
 	}
 }
 
@@ -230,7 +288,7 @@ class GameView {
 
 	buildDiceContainer(dice) {
 		const container = HTMLBuilder.createDiv('dice-container');
-		
+
 		dice.forEach(value => {
 			const die = HTMLBuilder.createDiv('die');
 			die.textContent = value > 0 ? value : '?';
@@ -243,7 +301,7 @@ class GameView {
 	buildScoreInfo(player) {
 		const container = HTMLBuilder.createDiv('score-info');
 		const state = this.gameEngine.getGameState();
-		
+
 		const sum = HTMLBuilder.createElement('p', '', {
 			textContent: `Sum: ${state.hasRolledThisRound ? player.getDiceSum() : '-'}`
 		});
@@ -265,7 +323,7 @@ class GameView {
 
 	buildControls() {
 		const controls = HTMLBuilder.createDiv('controls');
-		
+
 		this.rollButton = HTMLBuilder.createButton('Roll Dice', 'btn-roll', () => {
 			this.handleRollAction();
 		});
@@ -297,7 +355,7 @@ class GameView {
 	buildWinnerSection() {
 		const section = HTMLBuilder.createDiv('winner-announcement hidden');
 		this.winnerContent = HTMLBuilder.createDiv();
-		
+
 		const title = HTMLBuilder.createElement('h2', '', {
 			textContent: '🏆 Game Over! 🏆'
 		});
@@ -347,21 +405,6 @@ class GameView {
 	}
 }
 
-class MainMenuView {
-	constructor(gameEngine, onReset) {
-		this.gameEngine = gameEngine;
-		this.onReset = onReset;
-		this.container = null;
-	}
-
-	render () {
-		this.container = HTMLBuilder.createDiv('game-section');
-	}
-
-
-
-
-}
 
 /**
  * Application Controller
@@ -373,19 +416,26 @@ class GameApp {
 		this.registry = new GameRegistry();
 		this.currentGame = null;
 		this.currentView = null;
-		
+
 		this.init();
 	}
 
 	// For now, auto-select dice game
 	// Later you can add game selection menu
 	init() {
-		this.selectGame('dice');
+		this.showMainMenu();
+		// this.selectGame('dice');
 	}
 
 	selectGame(gameId) {
 		this.currentGame = this.registry.createGame(gameId);
 		this.showSetupView();
+	}
+
+	showMainMenu() {
+		this.clearView();
+		this.currentView = new MainMenuView((gameId) => this.selectGame(gameId));
+		this.container.appendChild(this.currentView.render());
 	}
 
 	showSetupView() {

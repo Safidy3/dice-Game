@@ -1,3 +1,5 @@
+import { GameEngine } from './index.js';
+import { Player } from './index.js';
 
 // ===========================
 // DICE GAME IMPLEMENTATION

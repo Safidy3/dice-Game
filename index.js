@@ -7,7 +7,7 @@
  * Base Player Model
  * Generic player - no game-specific logic
  */
-class Player {
+export class Player {
 	constructor(name) {
 		this.id = this.generateId();
 		this.name = name;
@@ -31,7 +31,7 @@ class Player {
  * Abstract Game Engine
  * Base class for all games - defines common structure
  */
-class GameEngine {
+export class GameEngine {
 	constructor() {
 		this.players = [];
 		this.currentRound = 1;
@@ -41,7 +41,7 @@ class GameEngine {
 	}
 
 	// ===== Common Methods (Shared by all games) =====
-	
+
 	addPlayer(name) {
 		if (!name || name.trim() === '')
 			throw new Error('Player name cannot be empty');
@@ -120,7 +120,7 @@ class GameEngine {
 	}
 
 	// ===== Abstract Methods (Must be implemented by subclasses) =====
-	
+
 	/**
 	 * Create game-specific player instance
 	 */
@@ -171,7 +171,7 @@ class GameEngine {
 	}
 
 	// ===== Hook Methods (Optional overrides) =====
-	
+
 	onGameStart() {
 		// Hook for game-specific initialization
 	}
@@ -193,7 +193,7 @@ class GameEngine {
  * Game Registry
  * Central registry for all available games
  */
-class GameRegistry {
+export class GameRegistry {
 	constructor() {
 		this.games = new Map();
 		this.registerDefaultGames();
@@ -208,6 +208,16 @@ class GameRegistry {
 			minPlayers: 2,
 			maxPlayers: 8
 		});
+
+		// Register King of Diamond game
+		this.register('king_of_diamond', {
+			name: 'King of Diamond',
+			description: 'Strategic number guessing - closest to average × 0.8 wins',
+			GameClass: KingOfDiamondEngine,
+			minPlayers: 2,
+			maxPlayers: 20
+		});
+
 
 		// Future games will be added here:
 		// this.register('rps', { ... });
